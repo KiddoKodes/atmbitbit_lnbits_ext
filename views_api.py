@@ -36,7 +36,7 @@ async def api_atmbitbits(
 
 @atmbitbit_ext.get("/api/v1/fetch_atm/{api_key_id}")
 async def api_atmbitbits(
-    api_key_id:string=Depends(require_admin_key)
+    api_key_id=Depends(require_admin_key)
 ):
 
 
