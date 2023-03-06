@@ -12,6 +12,7 @@ from .crud import (
     create_atmbitbit,
     delete_atmbitbit,
     get_atmbitbit,
+    get_atmbitbit_by_api_key_id,
     get_atmbitbits,
     update_atmbitbit,
 )
@@ -31,6 +32,15 @@ async def api_atmbitbits(
         wallet_ids = user.wallet_ids if user else []
 
     return [atmbitbit.dict() for atmbitbit in await get_atmbitbits(wallet_ids)]
+
+
+@atmbitbit_ext.get("/api/v1/fetch_atm/{api_key_id}")
+async def api_atmbitbits(
+    api_key_id:string=Depends(require_admin_key)
+):
+
+
+    return [atmbitbit.dict() for atmbitbit in await get_atmbitbit_by_api_key_id(api_key_id)]
 
 
 @atmbitbit_ext.get("/api/v1/atmbitbit/{atmbitbit_id}")
