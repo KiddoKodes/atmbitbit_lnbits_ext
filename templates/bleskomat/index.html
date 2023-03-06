@@ -1,18 +1,18 @@
 {% extends "base.html" %} {% from "macros.jinja" import window_vars with context
 %} {% block scripts %} {{ window_vars(user) }}
 <script>
-  {% if bleskomat_vars %}
-  window.bleskomat_vars = {{ bleskomat_vars | tojson | safe }}
+  {% if atmbitbit_vars %}
+  window.atmbitbit_vars = {{ atmbitbit_vars | tojson | safe }}
   {% endif %}
 </script>
-<script src="/bleskomat/static/js/index.js"></script>
+<script src="/atmbitbit/static/js/index.js"></script>
 {% endblock %} {% block page %}
 <div class="row q-col-gutter-md">
   <div class="col-12 col-md-7 q-gutter-y-md">
     <q-card>
       <q-card-section>
         <q-btn unelevated color="primary" @click="formDialog.show = true"
-          >Add Bleskomat</q-btn
+          >Add AtmBitBit</q-btn
         >
       </q-card-section>
     </q-card>
@@ -21,16 +21,16 @@
       <q-card-section>
         <div class="row items-center no-wrap q-mb-md">
           <div class="col">
-            <h5 class="text-subtitle1 q-my-none">Bleskomats</h5>
+            <h5 class="text-subtitle1 q-my-none">AtmBitBits</h5>
           </div>
         </div>
         <q-table
           dense
           flat
-          :data="sortedBleskomats"
+          :data="sortedAtmBitBits"
           row-key="id"
-          :columns="bleskomatsTable.columns"
-          :pagination.sync="bleskomatsTable.pagination"
+          :columns="atmbitbitsTable.columns"
+          :pagination.sync="atmbitbitsTable.pagination"
         >
           {% raw %}
           <template v-slot:header="props">
@@ -76,7 +76,7 @@
                   flat
                   dense
                   size="xs"
-                  @click="deleteBleskomat(props.row.id)"
+                  @click="deleteAtmBitBit(props.row.id)"
                   icon="cancel"
                   color="pink"
                 >
@@ -95,12 +95,12 @@
     <q-card>
       <q-card-section>
         <h6 class="text-subtitle1 q-my-none">
-          {{SITE_TITLE}} Bleskomat extension
+          {{SITE_TITLE}} AtmBitBit extension
         </h6>
       </q-card-section>
       <q-card-section class="q-pa-none">
         <q-separator></q-separator>
-        <q-list> {% include "bleskomat/_api_docs.html" %} </q-list>
+        <q-list> {% include "atmbitbit/_api_docs.html" %} </q-list>
       </q-card-section>
     </q-card>
   </div>
@@ -154,7 +154,7 @@
             unelevated
             color="primary"
             type="submit"
-            >Update Bleskomat</q-btn
+            >Update AtmBitBit</q-btn
           >
           <q-btn
             v-else
@@ -167,7 +167,7 @@
                 formDialog.data.exchange_rate_provider == null ||
                 formDialog.data.fee == null"
             type="submit"
-            >Add Bleskomat</q-btn
+            >Add AtmBitBit</q-btn
           >
           <q-btn v-close-popup flat color="grey" class="q-ml-auto"
             >Cancel</q-btn

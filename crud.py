@@ -4,22 +4,22 @@ from typing import List, Optional, Union
 from uuid import uuid4
 
 from . import db
-from .helpers import generate_bleskomat_lnurl_hash
-from .models import Bleskomat, BleskomatLnurl, CreateBleskomat
+from .helpers import generate_atmbitbit_lnurl_hash
+from .models import AtmBitBit, AtmBitBitLnurl, CreateAtmBitBit
 
 
-async def create_bleskomat(data: CreateBleskomat, wallet_id: str) -> Bleskomat:
-    bleskomat_id = uuid4().hex
+async def create_atmbitbit(data: CreateAtmBitBit, wallet_id: str) -> AtmBitBit:
+    atmbitbit_id = uuid4().hex
     api_key_id = secrets.token_hex(8)
     api_key_secret = secrets.token_hex(32)
     api_key_encoding = "hex"
     await db.execute(
         """
-        INSERT INTO bleskomat.bleskomats (id, wallet, api_key_id, api_key_secret, api_key_encoding, name, fiat_currency, exchange_rate_provider, fee)
+        INSERT INTO atmbitbit.atmbitbits (id, wallet, api_key_id, api_key_secret, api_key_encoding, name, fiat_currency, exchange_rate_provider, fee)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            bleskomat_id,
+            atmbitbit_id,
             wallet_id,
             api_key_id,
             api_key_secret,
@@ -30,84 +30,84 @@ async def create_bleskomat(data: CreateBleskomat, wallet_id: str) -> Bleskomat:
             data.fee,
         ),
     )
-    bleskomat = await get_bleskomat(bleskomat_id)
-    assert bleskomat, "Newly created bleskomat couldn't be retrieved"
-    return bleskomat
+    atmbitbit = await get_atmbitbit(atmbitbit_id)
+    assert atmbitbit, "Newly created atmbitbit couldn't be retrieved"
+    return atmbitbit
 
 
-async def get_bleskomat(bleskomat_id: str) -> Optional[Bleskomat]:
+async def get_atmbitbit(atmbitbit_id: str) -> Optional[AtmBitBit]:
     row = await db.fetchone(
-        "SELECT * FROM bleskomat.bleskomats WHERE id = ?", (bleskomat_id,)
+        "SELECT * FROM atmbitbit.atmbitbits WHERE id = ?", (atmbitbit_id,)
     )
-    return Bleskomat(**row) if row else None
+    return AtmBitBit(**row) if row else None
 
 
-async def get_bleskomat_by_api_key_id(api_key_id: str) -> Optional[Bleskomat]:
+async def get_atmbitbit_by_api_key_id(api_key_id: str) -> Optional[AtmBitBit]:
     row = await db.fetchone(
-        "SELECT * FROM bleskomat.bleskomats WHERE api_key_id = ?", (api_key_id,)
+        "SELECT * FROM atmbitbit.atmbitbits WHERE api_key_id = ?", (api_key_id,)
     )
-    return Bleskomat(**row) if row else None
+    return AtmBitBit(**row) if row else None
 
 
-async def get_bleskomats(wallet_ids: Union[str, List[str]]) -> List[Bleskomat]:
+async def get_atmbitbits(wallet_ids: Union[str, List[str]]) -> List[AtmBitBit]:
     if isinstance(wallet_ids, str):
         wallet_ids = [wallet_ids]
     q = ",".join(["?"] * len(wallet_ids))
     rows = await db.fetchall(
-        f"SELECT * FROM bleskomat.bleskomats WHERE wallet IN ({q})", (*wallet_ids,)
+        f"SELECT * FROM atmbitbit.atmbitbits WHERE wallet IN ({q})", (*wallet_ids,)
     )
-    return [Bleskomat(**row) for row in rows]
+    return [AtmBitBit(**row) for row in rows]
 
 
-async def update_bleskomat(bleskomat_id: str, **kwargs) -> Optional[Bleskomat]:
+async def update_atmbitbit(atmbitbit_id: str, **kwargs) -> Optional[AtmBitBit]:
     q = ", ".join([f"{field[0]} = ?" for field in kwargs.items()])
     await db.execute(
-        f"UPDATE bleskomat.bleskomats SET {q} WHERE id = ?",
-        (*kwargs.values(), bleskomat_id),
+        f"UPDATE atmbitbit.atmbitbits SET {q} WHERE id = ?",
+        (*kwargs.values(), atmbitbit_id),
     )
     row = await db.fetchone(
-        "SELECT * FROM bleskomat.bleskomats WHERE id = ?", (bleskomat_id,)
+        "SELECT * FROM atmbitbit.atmbitbits WHERE id = ?", (atmbitbit_id,)
     )
-    return Bleskomat(**row) if row else None
+    return AtmBitBit(**row) if row else None
 
 
-async def delete_bleskomat(bleskomat_id: str) -> None:
-    await db.execute("DELETE FROM bleskomat.bleskomats WHERE id = ?", (bleskomat_id,))
+async def delete_atmbitbit(atmbitbit_id: str) -> None:
+    await db.execute("DELETE FROM atmbitbit.atmbitbits WHERE id = ?", (atmbitbit_id,))
 
 
-async def create_bleskomat_lnurl(
-    *, bleskomat: Bleskomat, secret: str, tag: str, params: str, uses: int = 1
-) -> BleskomatLnurl:
-    bleskomat_lnurl_id = uuid4().hex
-    hash = generate_bleskomat_lnurl_hash(secret)
+async def create_atmbitbit_lnurl(
+    *, atmbitbit: AtmBitBit, secret: str, tag: str, params: str, uses: int = 1
+) -> AtmBitBitLnurl:
+    atmbitbit_lnurl_id = uuid4().hex
+    hash = generate_atmbitbit_lnurl_hash(secret)
     now = int(time.time())
     await db.execute(
         """
-        INSERT INTO bleskomat.bleskomat_lnurls (id, bleskomat, wallet, hash, tag, params, api_key_id, initial_uses, remaining_uses, created_time, updated_time)
+        INSERT INTO atmbitbit.atmbitbit_lnurls (id, atmbitbit, wallet, hash, tag, params, api_key_id, initial_uses, remaining_uses, created_time, updated_time)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            bleskomat_lnurl_id,
-            bleskomat.id,
-            bleskomat.wallet,
+            atmbitbit_lnurl_id,
+            atmbitbit.id,
+            atmbitbit.wallet,
             hash,
             tag,
             params,
-            bleskomat.api_key_id,
+            atmbitbit.api_key_id,
             uses,
             uses,
             now,
             now,
         ),
     )
-    bleskomat_lnurl = await get_bleskomat_lnurl(secret)
-    assert bleskomat_lnurl, "Newly created bleskomat LNURL couldn't be retrieved"
-    return bleskomat_lnurl
+    atmbitbit_lnurl = await get_atmbitbit_lnurl(secret)
+    assert atmbitbit_lnurl, "Newly created atmbitbit LNURL couldn't be retrieved"
+    return atmbitbit_lnurl
 
 
-async def get_bleskomat_lnurl(secret: str) -> Optional[BleskomatLnurl]:
-    hash = generate_bleskomat_lnurl_hash(secret)
+async def get_atmbitbit_lnurl(secret: str) -> Optional[AtmBitBitLnurl]:
+    hash = generate_atmbitbit_lnurl_hash(secret)
     row = await db.fetchone(
-        "SELECT * FROM bleskomat.bleskomat_lnurls WHERE hash = ?", (hash,)
+        "SELECT * FROM atmbitbit.atmbitbit_lnurls WHERE hash = ?", (hash,)
     )
-    return BleskomatLnurl(**row) if row else None
+    return AtmBitBitLnurl(**row) if row else None

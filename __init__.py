@@ -4,21 +4,21 @@ from starlette.staticfiles import StaticFiles
 from lnbits.db import Database
 from lnbits.helpers import template_renderer
 
-db = Database("ext_bleskomat")
+db = Database("ext_atmbitbit")
 
-bleskomat_static_files = [
+atmbitbit_static_files = [
     {
-        "path": "/bleskomat/static",
-        "app": StaticFiles(packages=[("lnbits", "extensions/bleskomat/static")]),
-        "name": "bleskomat_static",
+        "path": "/atmbitbit/static",
+        "app": StaticFiles(packages=[("lnbits", "extensions/atmbitbit/static")]),
+        "name": "atmbitbit_static",
     }
 ]
 
-bleskomat_ext: APIRouter = APIRouter(prefix="/bleskomat", tags=["Bleskomat"])
+atmbitbit_ext: APIRouter = APIRouter(prefix="/atmbitbit", tags=["AtmBitBit"])
 
 
-def bleskomat_renderer():
-    return template_renderer(["lnbits/extensions/bleskomat/templates"])
+def atmbitbit_renderer():
+    return template_renderer(["lnbits/extensions/atmbitbit/templates"])
 
 
 from .lnurl_api import *  # noqa: F401,F403

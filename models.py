@@ -14,7 +14,7 @@ from .exchange_rates import exchange_rate_providers, fiat_currencies
 from .helpers import LnurlValidationError, get_callback_url
 
 
-class CreateBleskomat(BaseModel):
+class CreateAtmBitBit(BaseModel):
     name: str = Query(...)
     fiat_currency: str = Query(...)
     exchange_rate_provider: str = Query(...)
@@ -39,7 +39,7 @@ class CreateBleskomat(BaseModel):
         return v
 
 
-class Bleskomat(BaseModel):
+class AtmBitBit(BaseModel):
     id: str
     wallet: str
     api_key_id: str
@@ -51,9 +51,9 @@ class Bleskomat(BaseModel):
     fee: str
 
 
-class BleskomatLnurl(BaseModel):
+class AtmBitBitLnurl(BaseModel):
     id: str
-    bleskomat: str
+    atmbitbit: str
     wallet: str
     hash: str
     tag: str
@@ -132,7 +132,7 @@ class BleskomatLnurl(BaseModel):
         now = int(time.time())
         result = await conn.execute(
             """
-            UPDATE bleskomat.bleskomat_lnurls
+            UPDATE atmbitbit.atmbitbit_lnurls
             SET remaining_uses = remaining_uses - 1, updated_time = ?
             WHERE id = ?
                 AND remaining_uses > 0

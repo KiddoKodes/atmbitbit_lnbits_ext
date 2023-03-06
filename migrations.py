@@ -2,7 +2,7 @@ async def m001_initial(db):
 
     await db.execute(
         """
-        CREATE TABLE bleskomat.bleskomats (
+        CREATE TABLE atmbitbit.atmbitbits (
             id TEXT PRIMARY KEY,
             wallet TEXT NOT NULL,
             api_key_id TEXT NOT NULL,
@@ -19,9 +19,9 @@ async def m001_initial(db):
 
     await db.execute(
         """
-        CREATE TABLE bleskomat.bleskomat_lnurls (
+        CREATE TABLE atmbitbit.atmbitbit_lnurls (
             id TEXT PRIMARY KEY,
-            bleskomat TEXT NOT NULL,
+            atmbitbit TEXT NOT NULL,
             wallet TEXT NOT NULL,
             hash TEXT NOT NULL,
             tag TEXT NOT NULL,

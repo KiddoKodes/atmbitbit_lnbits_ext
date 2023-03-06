@@ -5,27 +5,27 @@ from http import HTTPStatus
 from loguru import logger
 from starlette.requests import Request
 
-from . import bleskomat_ext
+from . import atmbitbit_ext
 from .crud import (
-    create_bleskomat_lnurl,
-    get_bleskomat_by_api_key_id,
-    get_bleskomat_lnurl,
+    create_atmbitbit_lnurl,
+    get_atmbitbit_by_api_key_id,
+    get_atmbitbit_lnurl,
 )
 from .exchange_rates import fetch_fiat_exchange_rate
 from .helpers import (
     LnurlHttpError,
     LnurlValidationError,
-    generate_bleskomat_lnurl_secret,
-    generate_bleskomat_lnurl_signature,
+    generate_atmbitbit_lnurl_secret,
+    generate_atmbitbit_lnurl_signature,
     prepare_lnurl_params,
     query_to_signing_payload,
     unshorten_lnurl_query,
 )
 
 
-# Handles signed URL from Bleskomat ATMs and "action" callback of auto-generated LNURLs.
-@bleskomat_ext.get("/u", name="bleskomat.api_bleskomat_lnurl")
-async def api_bleskomat_lnurl(req: Request):
+# Handles signed URL from AtmBitBit ATMs and "action" callback of auto-generated LNURLs.
+@atmbitbit_ext.get("/u", name="atmbitbit.api_atmbitbit_lnurl")
+async def api_atmbitbit_lnurl(req: Request):
     try:
         query = dict(req.query_params)
 
@@ -52,12 +52,12 @@ async def api_bleskomat_lnurl(req: Request):
             # https://github.com/chill117/lnurl-node#how-to-implement-url-signing-scheme
             payload = query_to_signing_payload(query)
             api_key_id = query["id"]
-            bleskomat = await get_bleskomat_by_api_key_id(api_key_id)
-            if not bleskomat:
+            atmbitbit = await get_atmbitbit_by_api_key_id(api_key_id)
+            if not atmbitbit:
                 raise LnurlHttpError("Unknown API key", HTTPStatus.BAD_REQUEST)
-            api_key_secret = bleskomat.api_key_secret
-            api_key_encoding = bleskomat.api_key_encoding
-            expected_signature = generate_bleskomat_lnurl_signature(
+            api_key_secret = atmbitbit.api_key_secret
+            api_key_encoding = atmbitbit.api_key_encoding
+            expected_signature = generate_atmbitbit_lnurl_signature(
                 payload, api_key_secret, api_key_encoding
             )
             if signature != expected_signature:
@@ -65,8 +65,8 @@ async def api_bleskomat_lnurl(req: Request):
 
             # Signature is valid.
             # In the case of signed URLs, the secret is deterministic based on the API key ID and signature.
-            secret = generate_bleskomat_lnurl_secret(api_key_id, signature)
-            lnurl = await get_bleskomat_lnurl(secret)
+            secret = generate_atmbitbit_lnurl_secret(api_key_id, signature)
+            lnurl = await get_atmbitbit_lnurl(secret)
             if not lnurl:
                 try:
                     tag = query["tag"]
@@ -74,10 +74,10 @@ async def api_bleskomat_lnurl(req: Request):
                     if "f" in query:
                         rate = await fetch_fiat_exchange_rate(
                             currency=query["f"],
-                            provider=bleskomat.exchange_rate_provider,
+                            provider=atmbitbit.exchange_rate_provider,
                         )
                         # Convert fee (%) to decimal:
-                        fee = float(bleskomat.fee) / 100
+                        fee = float(atmbitbit.fee) / 100
                         if tag == "withdrawRequest":
                             for key in ["minWithdrawable", "maxWithdrawable"]:
                                 amount_sats = int(
@@ -91,8 +91,8 @@ async def api_bleskomat_lnurl(req: Request):
                     raise LnurlHttpError(str(e), HTTPStatus.BAD_REQUEST)
                 # Create a new LNURL using the query parameters provided in the signed URL.
                 json_params = json.JSONEncoder().encode(params)
-                lnurl = await create_bleskomat_lnurl(
-                    bleskomat=bleskomat,
+                lnurl = await create_atmbitbit_lnurl(
+                    atmbitbit=atmbitbit,
                     secret=secret,
                     tag=tag,
                     params=json_params,
@@ -109,7 +109,7 @@ async def api_bleskomat_lnurl(req: Request):
             raise LnurlHttpError("Missing secret", HTTPStatus.BAD_REQUEST)
 
         secret = query["k1"]
-        lnurl = await get_bleskomat_lnurl(secret)
+        lnurl = await get_atmbitbit_lnurl(secret)
         if not lnurl:
             raise LnurlHttpError("Invalid secret", HTTPStatus.BAD_REQUEST)
 
