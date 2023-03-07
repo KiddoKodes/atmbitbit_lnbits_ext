@@ -40,7 +40,7 @@ async def api_atmbitbits(
 ):
 
     atm= (await get_atmbitbit_by_api_key_id(api_key_id)).dict()
-    if(atm.id==wallet.wallet.id):
+    if(atm["id"]==wallet.wallet.id):
         return atm
     else:
          raise HTTPException(
