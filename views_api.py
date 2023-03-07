@@ -39,7 +39,14 @@ async def api_atmbitbits(
       api_key_id, wallet: WalletTypeInfo = Depends(require_admin_key)
 ):
 
-    return (await get_atmbitbit_by_api_key_id(api_key_id)).dict()
+    atm= (await get_atmbitbit_by_api_key_id(api_key_id)).dict()
+    if(atm.id==wallet.wallet.id):
+        return atm
+    else:
+         raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="AtmBitBit ATM not found",
+        )
 
 
 @atmbitbit_ext.get("/api/v1/atmbitbit/{atmbitbit_id}")
